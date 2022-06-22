@@ -19,7 +19,15 @@ export class AuthService {
       redirect_uri: `${Constants.clientRoot}signin-callback`,
       scope: 'openid profile projects-api',
       response_type: 'code',
-      post_logout_redirect_uri: `${Constants.clientRoot}signout-callback`
+      post_logout_redirect_uri: `${Constants.clientRoot}signout-callback`//,
+      // metadata: {
+      //   issuer: `${Constants.stsAuthority}`,
+      //   authorization_endpoint: `${Constants.stsAuthority}authorize?audience=projects-api`,
+      //   jwks_uri: `${Constants.stsAuthority}.well-known/jwks.json`,
+      //   token_endpoint: `${Constants.stsAuthority}oauth/token`,
+      //   userinfo_endpoint: `${Constants.stsAuthority}userinfo`,
+      //   end_session_endpoint: `${Constants.stsAuthority}v2/logout?client_id=${Constants.clientId}&returnTo=${encodeURI(Constants.clientRoot)}signout-callback`
+      // }
     };
     this._userManager = new UserManager(stsSettings);
   }
@@ -54,6 +62,17 @@ export class AuthService {
   completeLogout() {
     this._user = null;
     return this._userManager.signoutRedirectCallback();
+  }
+
+  getAccessToken(){
+    this._userManager.getUser().then(user => {
+      if(!!user && !user.expired){
+          return user.access_token;
+      }
+      else {
+        return null;
+      }
+    })
   }
 
 }
